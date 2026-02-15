@@ -74,10 +74,11 @@ async function authorize() {
   );
 
   if (fs.existsSync(TOKEN_PATH)) {
-    oAuth2Client.setCredentials(
-      JSON.parse(fs.readFileSync(TOKEN_PATH, "utf8")),
-    );
-    return oAuth2Client;
+    const token = fs.readFileSync(TOKEN_PATH, "utf8");
+    if (token.trim()) {
+      oAuth2Client.setCredentials(JSON.parse(token));
+      return oAuth2Client;
+    }
   }
 
   const authUrl = oAuth2Client.generateAuthUrl({

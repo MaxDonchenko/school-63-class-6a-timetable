@@ -24,7 +24,13 @@ async function run() {
     return;
   }
 
-  oAuth2Client.setCredentials(JSON.parse(fs.readFileSync(TOKEN_PATH, "utf8")));
+  const token = fs.readFileSync(TOKEN_PATH, "utf8");
+  if (!token.trim()) {
+    console.error("token.json is empty. Run create script first.");
+    return;
+  }
+
+  oAuth2Client.setCredentials(JSON.parse(token));
 
   const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
 
