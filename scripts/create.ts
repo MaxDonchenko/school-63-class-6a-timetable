@@ -106,46 +106,73 @@ async function authorize() {
   return oAuth2Client;
 }
 
-async function createEvents(auth: any) {
-  const calendar = google.calendar({ version: "v3", auth });
+const dayOffsets: Record<DayCode, number> = {
+  MO: 0,
+  TU: 1,
+  WE: 2,
+  TH: 3,
+  FR: 4,
+};
 
-  const startDate = "2026-02-16";
+async function createEvents(auth: any, isDryRun: boolean = false) {
+  const calendar = auth ? google.calendar({ version: "v3", auth }) : null;
+
+  const startDateBase = "2026-02-16";
   const until = "20260531T235900Z";
 
   for (const [dayCode, subjects] of Object.entries(timetable)) {
+    const offset = dayOffsets[dayCode as DayCode];
+    const date = new Date(startDateBase);
+    date.setDate(date.getDate() + offset);
+    const currentDate = date.toISOString().split("T")[0];
+
     for (let i = 0; i < subjects.length; i++) {
       const subject = subjects[i];
-      const teacher = teacherMap[subject];
-
-      if (!teacher) {
-        console.log(`Skipped (no teacher): ${subject}`);
-        continue;
-      }
+      const teacher = teacherMap[subject] || "-";
 
       const [startTime, endTime] = lessonTimes[i];
+
+      if (isDryRun) {
+        console.log(
+          `[DRY RUN] Would create: Date: ${currentDate} | Time: ${startTime}-${endTime} | ${subject} (${dayCode}) | Teacher: ${teacher}`,
+        );
+        continue;
+      }
 
       const event: calendar_v3.Schema$Event = {
         summary: subject,
         description: `Teacher: ${teacher}\nTag: ${SCRIPT_TAG}`,
         start: {
-          dateTime: `${startDate}T${startTime}:00`,
+          dateTime: `${currentDate}T${startTime}:00`,
           timeZone: "Europe/Kyiv",
         },
         end: {
-          dateTime: `${startDate}T${endTime}:00`,
+          dateTime: `${currentDate}T${endTime}:00`,
           timeZone: "Europe/Kyiv",
         },
         recurrence: [`RRULE:FREQ=WEEKLY;BYDAY=${dayCode};UNTIL=${until}`],
       };
 
-      await calendar.events.insert({
-        calendarId: "primary",
-        requestBody: event,
-      });
-
-      console.log(`Created: ${subject} (${dayCode})`);
+      if (calendar) {
+        await calendar.events.insert({
+          calendarId: "primary",
+          requestBody: event,
+        });
+        console.log(`Created: ${subject} (${dayCode})`);
+      }
     }
   }
 }
 
-authorize().then(createEvents).catch(console.error);
+const isDryRun = process.argv.includes("--dry-run");
+
+if (isDryRun) {
+  console.log(
+    "Starting DRY RUN (no events will be created, no auth required)...",
+  );
+  createEvents(null, true).catch(console.error);
+} else {
+  authorize()
+    .then((auth) => createEvents(auth))
+    .catch(console.error);
+}

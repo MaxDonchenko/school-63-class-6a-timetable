@@ -32,7 +32,15 @@ npm run create
 
 Upon first run, it will open a browser window for Google authentication. After authorizing, copy the code and paste it back into the terminal.
 
-### 3. Deletion
+### 3. Dry Run
+
+To see what events would be created without actually making any changes or requiring authentication:
+
+```bash
+npm run create -- --dry-run
+```
+
+### 4. Deletion
 
 To remove all events created by this script:
 
