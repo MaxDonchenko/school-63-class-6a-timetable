@@ -2,8 +2,10 @@
 
 This project automates the process of adding a school timetable to Google Calendar for School 63, Class 6A. It uses the Google Calendar API to create recurring events for each lesson.
 
-<img src="assets/calendar-view-1.png" width="49%" alt="Calendar View After Creation 1">
-<img src="assets/calendar-view-2.png" width="49%" alt="Calendar View After Creation 2">
+<p>
+    <img src="assets/calendar-view-1.png" width="49%" alt="Calendar View After Creation 1">
+    <img src="assets/calendar-view-2.png" width="49%" alt="Calendar View After Creation 2">
+</p>
 
 ## Features
 
