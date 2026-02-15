@@ -1,0 +1,20 @@
+{
+  "name": "school-63-class-6a-timetable",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "create": "tsx scripts/create.ts",
+    "delete": "tsx scripts/delete.ts",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "googleapis": "^171.4.0",
+    "open": "^11.0.0"
+  }
+}
